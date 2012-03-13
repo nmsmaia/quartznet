@@ -20,6 +20,7 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.Text;
 
 using Quartz.Impl.Triggers;
@@ -40,7 +41,8 @@ namespace Quartz.Impl.AdoJobStore
     {
         public override bool CanHandleTriggerType(IOperableTrigger trigger)
         {
-            return ((trigger is DailyTimeIntervalTriggerImpl) && !((DailyTimeIntervalTriggerImpl) trigger).HasAdditionalProperties);
+            return ((trigger is DailyTimeIntervalTriggerImpl) &&
+                    !((DailyTimeIntervalTriggerImpl) trigger).HasAdditionalProperties);
         }
 
         /// <summary>
@@ -62,11 +64,11 @@ namespace Quartz.Impl.AdoJobStore
             props.Int2 = dailyTrigger.TimesTriggered;
 
             ISet<DayOfWeek> days = dailyTrigger.DaysOfWeek;
-            string daysStr = Join(days, ",");
+            string daysStr = string.Join(",", days.Cast<int>().Select(x => x.ToString()).ToArray());
             props.String2 = daysStr;
 
             StringBuilder timeOfDayBuffer = new StringBuilder();
-            TimeOfDay startTimeOfDay = dailyTrigger.StartTimeOfDayUtc;
+            TimeOfDay startTimeOfDay = dailyTrigger.StartTimeOfDay;
             if (startTimeOfDay != null)
             {
                 timeOfDayBuffer.Append(startTimeOfDay.Minute).Append(",");
@@ -78,7 +80,7 @@ namespace Quartz.Impl.AdoJobStore
                 timeOfDayBuffer.Append(",,,");
             }
 
-            TimeOfDay endTimeOfDay = dailyTrigger.EndTimeOfDayUtc;
+            TimeOfDay endTimeOfDay = dailyTrigger.EndTimeOfDay;
             if (endTimeOfDay != null)
             {
                 timeOfDayBuffer.Append(endTimeOfDay.Hour).Append(",");
@@ -94,31 +96,15 @@ namespace Quartz.Impl.AdoJobStore
             return props;
         }
 
-        private static string Join(ISet<DayOfWeek> days, string sep)
-        {
-            StringBuilder sb = new StringBuilder();
-            if (days == null || days.Count <= 0)
-            {
-                return "";
-            }
-
-            foreach (DayOfWeek itr in days)
-            {
-                sb.Append(sep).Append(itr);
-            }
-
-            return sb.ToString();
-        }
-
         protected override TriggerPropertyBundle GetTriggerPropertyBundle(SimplePropertiesTriggerProperties props)
         {
-            int repeatCount = (int)props.Long1;
+            int repeatCount = (int) props.Long1;
             int interval = props.Int1;
             string intervalUnitStr = props.String1;
             string daysOfWeekStr = props.String2;
             string timeOfDayStr = props.String3;
 
-            IntervalUnit intervalUnit = (IntervalUnit) Enum.Parse(typeof(IntervalUnit), intervalUnitStr, true);
+            IntervalUnit intervalUnit = (IntervalUnit) Enum.Parse(typeof (IntervalUnit), intervalUnitStr, true);
             DailyTimeIntervalScheduleBuilder scheduleBuilder = DailyTimeIntervalScheduleBuilder.Create()
                 .WithInterval(interval, intervalUnit)
                 .WithRepeatCount(repeatCount);
@@ -126,7 +112,7 @@ namespace Quartz.Impl.AdoJobStore
             if (daysOfWeekStr != null)
             {
                 ISet<DayOfWeek> daysOfWeek = new HashSet<DayOfWeek>();
-                String[] nums = daysOfWeekStr.Split(',');
+                string[] nums = daysOfWeekStr.Split(',');
                 if (nums.Length > 0)
                 {
                     foreach (String num in nums)
@@ -144,7 +130,7 @@ namespace Quartz.Impl.AdoJobStore
             if (timeOfDayStr != null)
             {
                 string[] nums = timeOfDayStr.Split(',');
-                TimeOfDay startTimeOfDay = null;
+                TimeOfDay startTimeOfDay;
                 if (nums.Length >= 3)
                 {
                     int hour = Int32.Parse(nums[0]);
@@ -177,11 +163,11 @@ namespace Quartz.Impl.AdoJobStore
                 scheduleBuilder.StartingDailyAt(TimeOfDay.HourMinuteAndSecondOfDay(0, 0, 0));
                 scheduleBuilder.EndingDailyAt(TimeOfDay.HourMinuteAndSecondOfDay(23, 59, 59));
             }
-            
+
 
             int timesTriggered = props.Int2;
-            String[] statePropertyNames = {"timesTriggered"};
-            Object[] statePropertyValues = {timesTriggered};
+            string[] statePropertyNames = {"timesTriggered"};
+            object[] statePropertyValues = {timesTriggered};
 
             return new TriggerPropertyBundle(scheduleBuilder, statePropertyNames, statePropertyValues);
         }
