@@ -37,7 +37,8 @@
 
 
   <target name="build">
-    <call target="build-${target.framework}" />
+    <call target="build-3.5" />
+    <call target="build-4.0" />
   </target>
 
   <target name="build-all">
@@ -122,6 +123,9 @@
       </resources>
       <resources dynamicprefix="false" prefix="Quartz.Impl.AdoJobStore.Common">
         <include name="src/Quartz/Impl/AdoJobStore/Common/dbproviders.properties" />
+      </resources>
+      <resources dynamicprefix="false" prefix="Quartz.Xml">
+        <include name="src/Quartz/Xml/job_scheduling_data_2_0.xsd" />
       </resources>
       <references>
         <include name="System.dll" />

@@ -102,9 +102,6 @@
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
-    <Reference Include="System.XML">
-      <Name>System.XML</Name>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AssemblyInfo.cs">
@@ -134,6 +131,7 @@
     <Compile Include="SchedulerListenerTest.cs" />
     <Compile Include="SchedulerTest.cs" />
     <Compile Include="SerializationTest.cs" />
+    <Compile Include="Simpl\SystemPropertyInstanceIdGeneratorTest.cs" />
     <Compile Include="TestUtil.cs" />
     <Compile Include="Core\QuartzSchedulerTest.cs" />
     <Compile Include="CronExpressionTest.cs">
@@ -236,10 +234,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Quartz.Examples\Quartz.Examples.2010.csproj">
-      <Project>{70A37974-17DE-474C-8A1C-19637622E75F}</Project>
-      <Name>Quartz.Examples.2010</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Quartz\Quartz.2010.csproj">
       <Project>{AEF8823B-E45B-4B35-A4D0-C08C1196D017}</Project>
       <Name>Quartz.2010</Name>
